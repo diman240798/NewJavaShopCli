@@ -10,7 +10,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataProviderCsv implements AbstractDataProvider {
+public class DataProviderCsv implements DataProvider {
 
     public final static Logger LOG = LogManager.getLogger(DataProviderCsv.class);
 

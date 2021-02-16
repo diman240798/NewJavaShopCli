@@ -10,7 +10,7 @@ import java.util.List;
 
 import static ru.sfedu.shop.Constants.*;
 
-public class DataProviderJdbc implements AbstractDataProvider {
+public class DataProviderJdbc implements DataProvider {
 
     private static final String QUERY_CREATE = "CREATE TABLE IF NOT EXISTS %s (%s)";
     private static final String QUERY_GET_ALL = "SELECT * FROM %s";

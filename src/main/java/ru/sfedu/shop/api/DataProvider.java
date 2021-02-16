@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-public interface AbstractDataProvider {
+public interface DataProvider {
 
     Logger LOG = LogManager.getLogger(DataProviderCsv.class);
 
@@ -92,11 +92,15 @@ public interface AbstractDataProvider {
      * @return boolean - успешно, неуспешно
      */
     default boolean insertComputer(String modelStr) throws Exception {
-        Computer item = InsertManager.getComputerFromString(modelStr);
-        String entity = Constants.COMPUTER;
-        List items = getAll(entity);
-        List ids = (List) items.stream().map(it -> ((Computer) it).getId()).collect(Collectors.toList());
-        return insertCheckId(item.getId(), ids, item, items, entity);
+        Optional<Computer> itemOption = InsertManager.getComputerFromString(modelStr);
+        if (itemOption.isPresent()) {
+            Computer item = itemOption.get();
+            String entity = Constants.COMPUTER;
+            List items = getAll(entity);
+            List ids = (List) items.stream().map(it -> ((Computer) it).getId()).collect(Collectors.toList());
+            return insertCheckId(item.getId(), ids, item, items, entity);
+        }
+        return false;
     }
 
     /**
@@ -105,11 +109,15 @@ public interface AbstractDataProvider {
      * @return boolean - успешно, неуспешно
      */
     default boolean insertFridge(String modelStr) throws Exception {
-        Fridge item = InsertManager.getFridgeFromString(modelStr);
-        String entity = Constants.FRIDGE;
-        List items = getAll(entity);
-        List ids = (List) items.stream().map(it -> ((Computer) it).getId()).collect(Collectors.toList());
-        return insertCheckId(item.getId(), ids, item, items, entity);
+        Optional<Fridge> itemOption = InsertManager.getFridgeFromString(modelStr);
+        if (itemOption.isPresent()) {
+            Fridge item = itemOption.get();
+            String entity = Constants.FRIDGE;
+            List items = getAll(entity);
+            List ids = (List) items.stream().map(it -> ((Fridge) it).getId()).collect(Collectors.toList());
+            return insertCheckId(item.getId(), ids, item, items, entity);
+        }
+        return false;
     }
 
     /**
@@ -118,11 +126,15 @@ public interface AbstractDataProvider {
      * @return boolean - успешно, неуспешно
      */
     default boolean insertSoda(String modelStr) throws Exception {
-        Soda item = InsertManager.getSodaFromString(modelStr);
-        String entity = Constants.SODA;
-        List items = getAll(entity);
-        List ids = (List) items.stream().map(it -> ((Computer) it).getId()).collect(Collectors.toList());
-        return insertCheckId(item.getId(), ids, item, items, entity);
+        Optional<Soda> itemOption = InsertManager.getSodaFromString(modelStr);
+        if (itemOption.isPresent()) {
+            Soda item = itemOption.get();
+            String entity = Constants.SODA;
+            List items = getAll(entity);
+            List ids = (List) items.stream().map(it -> ((Soda) it).getId()).collect(Collectors.toList());
+            return insertCheckId(item.getId(), ids, item, items, entity);
+        }
+        return false;
     }
 
 
@@ -147,9 +159,11 @@ public interface AbstractDataProvider {
         LOG.info("Getting bucket entity");
         Optional<Bucket> bucketOption = getBucketByUserSession(userSession);
 
+        long sessionId = sessionOption.get().getId();
+
         if (!bucketOption.isPresent()) {
             LOG.info("You have not added single product to bucket. No check will be printed.");
-            boolean deleteSession = deleteSession(sessionOption.get());
+            boolean deleteSession = deleteSession(sessionId);
             if (deleteSession) {
                 LOG.info("Session closed");
                 return true;
@@ -188,7 +202,7 @@ public interface AbstractDataProvider {
         LOG.info("Your receipt is: \n{}", receipt);
 
         deleteBucket(bucket);
-        deleteSession(sessionOption.get());
+        deleteSession(sessionId);
         return true;
     }
 
@@ -251,9 +265,7 @@ public interface AbstractDataProvider {
         );
 
         bucket.addProduct(productId, category);
-        List items = getAll(Constants.BUCKET);
-        items.add(bucket);
-        if (insertList(items, Constants.BUCKET)) {
+        if (upsertBucket(bucket)) {
             LOG.info("Product added succesfully");
             return true;
         } else {
@@ -335,14 +347,14 @@ public interface AbstractDataProvider {
     /**
      * Удалить сессию
      *
-     * @param session - сессия
+     * @param sessionId - id сессии
      * @return void
      */
-    default boolean deleteSession(Session session) throws Exception {
+    default boolean deleteSession(long sessionId) throws Exception {
         String entity = Constants.SESSION;
         List<Session> all = getAll(entity);
         List<Session> newList = all.stream()
-                .filter(it -> !Objects.equals(it.getId(), session.getId()))
+                .filter(it -> !Objects.equals(it.getId(), sessionId))
                 .collect(Collectors.toList());
         return insertList(newList, entity);
     }
@@ -383,5 +395,21 @@ public interface AbstractDataProvider {
         items.add(item);
         insertList(items, entity);
         return true;
+    }
+
+    /**
+     * Вставить/обновить корзину
+     *
+     * @param item - модель корзины
+     * @return void
+     */
+    default boolean upsertBucket(Bucket item) throws Exception {
+        String entity = Constants.BUCKET;
+        List items = (List) getAll(entity).stream()
+                .filter(it -> ((Bucket) it).getId() != item.getId())
+                .collect(Collectors.toList());
+        items.add(item);
+        return insertList(items, entity);
+
     }
 }

@@ -2,7 +2,7 @@ package ru.sfedu.shop;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.sfedu.shop.api.AbstractDataProvider;
+import ru.sfedu.shop.api.DataProvider;
 import ru.sfedu.shop.api.DataProviderCsv;
 import ru.sfedu.shop.api.DataProviderJdbc;
 import ru.sfedu.shop.api.DataProviderXml;
@@ -24,16 +24,14 @@ public class Main {
     public static void main(String[] args) {
         initEnvironmentConstants();
 
-        List<String> arguments = Arrays.asList(args);
-        LOG.debug(arguments.toString());
-
-        AbstractDataProvider dataProvider = resolveDataProvider(arguments);
+        DataProvider dataProvider = resolveDataProvider(args);
+        LOG.info("DataProvider chosen: Success!");
         if (dataProvider == null) {
             LOG.error(Constants.BAD_ARGS);
             System.exit(1);
         }
-        String result = resolveAPIResult(dataProvider, arguments);
-        System.out.print(result);
+        String result = resolveAPIResult(dataProvider, args);
+        LOG.info("Api result {}", result);
     }
 
 
@@ -85,9 +83,9 @@ public class Main {
     }
 
 
-    private static String resolveAPIResult(AbstractDataProvider dataProvider, List<String> arguments) {
+    private static String resolveAPIResult(DataProvider dataProvider, String[] arguments) {
         try {
-            String action = arguments.get(1);
+            String action = arguments[1];
             switch (action.trim().toLowerCase()) {
                 case Constants.INIT: {
                     dataProvider.init();
@@ -98,110 +96,130 @@ public class Main {
                 // GET ALL
                 case Constants.GET_ALL_CATEGORY: {
                     List items = dataProvider.getAll(Constants.CATEGORY);
-                    LOG.info(items);
+                    LOG.info("Categories: \n{}", items);
+                    break;
                 }
                 case Constants.GET_ALL_COMPUTER: {
                     List items = dataProvider.getAll(Constants.COMPUTER);
-                    LOG.info(items);
+                    LOG.info("Computers: \n{}", items);
+                    break;
                 }
                 case Constants.GET_ALL_FRIDGE: {
                     List items = dataProvider.getAll(Constants.FRIDGE);
-                    LOG.info(items);
+                    LOG.info("Fridges: \n{}", items);
+                    break;
                 }
                 case Constants.GET_ALL_RECEIPT: {
                     List items = dataProvider.getAll(Constants.RECEIPT);
-                    LOG.info(items);
+                    LOG.info("Receipts: \n{}", items);
+                    break;
                 }
                 case Constants.GET_ALL_SODA: {
                     List items = dataProvider.getAll(Constants.SODA);
-                    LOG.info(items);
+                    LOG.info("Sodas: \n{}", items);
+                    break;
                 }
 
                 // GET BY ID
                 case Constants.GET_CATEGORY: {
-                    long id = Long.parseLong(arguments.get(2));
+                    long id = Long.parseLong(arguments[2]);
                     Optional<Category> item = dataProvider.getCategory(id);
                     if (item.isPresent()) {
-                        LOG.info(item);
+                        LOG.info(item.get());
                     } else {
                         LOG.info("Item with such id doesnt exist");
                         LOG.debug("Item with such id doesnt exist: {}", id);
                     }
+                    break;
                 }
                 case Constants.GET_COMPUTER: {
-                    long id = Long.parseLong(arguments.get(2));
+                    long id = Long.parseLong(arguments[2]);
                     Optional<Computer> item = dataProvider.getComputer(id);
                     if (item.isPresent()) {
-                        LOG.info(item);
+                        LOG.info(item.get());
                     } else {
                         LOG.info("Item with such id doesnt exist");
                         LOG.debug("Item with such id doesnt exist: {}", id);
                     }
+                    break;
                 }
                 case Constants.GET_FRIDGE: {
-                    long id = Long.parseLong(arguments.get(2));
+                    long id = Long.parseLong(arguments[2]);
                     Optional<Fridge> item = dataProvider.getFridge(id);
                     if (item.isPresent()) {
-                        LOG.info(item);
+                        LOG.info(item.get());
                     } else {
                         LOG.info("Item with such id doesnt exist");
                         LOG.debug("Item with such id doesnt exist: {}", id);
                     }
+                    break;
                 }
                 case Constants.GET_RECEIPT: {
-                    long id = Long.parseLong(arguments.get(2));
+                    long id = Long.parseLong(arguments[2]);
                     Optional<Receipt> item = dataProvider.getReceipt(id);
                     if (item.isPresent()) {
-                        LOG.info(item);
+                        LOG.info(item.get());
                     } else {
                         LOG.info("Item with such id doesnt exist");
                         LOG.debug("Item with such id doesnt exist: {}", id);
                     }
+                    break;
                 }
                 case Constants.GET_SODA: {
-                    long id = Long.parseLong(arguments.get(2));
+                    long id = Long.parseLong(arguments[2]);
                     Optional<Soda> item = dataProvider.getSoda(id);
                     if (item.isPresent()) {
-                        LOG.info(item);
+                        LOG.info(item.get());
                     } else {
                         LOG.info("Item with such id doesnt exist");
                         LOG.debug("Item with such id doesnt exist: {}", id);
                     }
+                    break;
                 }
 
                 // INSERT
                 case Constants.INSERT_COMPUTER: {
-                    String item = arguments.get(2);
-                    dataProvider.insertComputer(item);
+                    String item = arguments[2];
+                    if (!dataProvider.insertComputer(item)) {
+                        return Constants.FAILURE;
+                    }
+                    break;
                 }
                 case Constants.INSERT_FRIDGE: {
-                    String item = arguments.get(2);
-                    dataProvider.insertFridge(item);
+                    String item = arguments[2];
+                    if (!dataProvider.insertFridge(item)) {
+                        return Constants.FAILURE;
+                    }
+                    break;
                 }
                 case Constants.INSERT_SODA: {
-                    String item = arguments.get(2);
-                    dataProvider.insertSoda(item);
+                    String item = arguments[2];
+                    if (!dataProvider.insertSoda(item)) {
+                        return Constants.FAILURE;
+                    }
+                    break;
                 }
-
 
                 // SHOP ACTIONS
                 case Constants.START_SESSION: {
-                    dataProvider.startSession();
+                    LOG.info("Session started: {}", dataProvider.startSession());
                     break;
                 }
                 case Constants.FINISH_SESSION: {
-                    String userSession = arguments.get(2);
+                    String userSession = arguments[2];
                     if (!dataProvider.finishSession(userSession)) {
                         return Constants.FAILURE;
                     }
+                    break;
                 }
                 case Constants.ADD_PRODUCT_TO_BUCKET: {
-                    String userSession = arguments.get(2);
-                    long prodId = Long.parseLong(arguments.get(3));
-                    String category = arguments.get(4);
+                    String userSession = arguments[2];
+                    long prodId = Long.parseLong(arguments[3]);
+                    String category = arguments[4];
                     if (!dataProvider.addProduct(userSession, prodId, category)) {
                         return Constants.FAILURE;
                     }
+                    break;
                 }
 
                 default:
@@ -215,11 +233,13 @@ public class Main {
         return Constants.FAILURE;
     }
 
-    private static AbstractDataProvider resolveDataProvider(List<String> arguments) {
+    private static DataProvider resolveDataProvider(String[] arguments) {
         LOG.info("Resolving csv provider");
         LOG.debug("Resolving csv provider by args {}", String.join(",", arguments));
-        if (arguments.size() == 0) return null;
-        switch (arguments.get(0)) {
+        if (arguments.length == 0) {
+            throw new RuntimeException("Empty arguments!");
+        }
+        switch (arguments[0]) {
             case Constants.CSV_DATA_PROVIDER:
                 return new DataProviderCsv();
             case Constants.XML_DATA_PROVIDER:

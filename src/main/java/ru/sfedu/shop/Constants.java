@@ -17,14 +17,14 @@ public class Constants {
     // GET ALL
     public static final String GET_ALL_COMPUTER = "get_all_computer";
     public static final String GET_ALL_CATEGORY = "get_all_category";
-    public static final String GET_ALL_FRIDGE = "get_all_fridge ";
+    public static final String GET_ALL_FRIDGE = "get_all_fridge";
     public static final String GET_ALL_SODA = "get_all_soda";
     public static final String GET_ALL_RECEIPT = "get_all_receipt";
 
     // GET BY ID
     public static final String GET_COMPUTER = "get_computer";
     public static final String GET_CATEGORY = "get_category";
-    public static final String GET_FRIDGE = "get_fridge ";
+    public static final String GET_FRIDGE = "get_fridge";
     public static final String GET_SODA = "get_soda";
     public static final String GET_RECEIPT = "get_receipt";
 
@@ -91,14 +91,25 @@ public class Constants {
     public static File SESSION_FILE_XML = new File("./xml/session.xml");
     public static File SODA_FILE_XML = new File("./xml/soda.xml");
 
-    public static List<File> DB_FILES;
-
     // File JDBC
     public static final String DB_URL = "jdbc:h2:./jdbc.db";
     public static final String USER = "user";
     public static final String PASS = "user";
     public static File JDBC_MV = new File("./jdbc.db.mv.db");
     public static File JDBC_TRACE = new File("./jdbc.db.trace.db");
+
+    public static List<File> DB_FILES = Arrays.asList(
+            CATEGORY_FILE_CSV, CATEGORY_FILE_XML,
+            SODA_FILE_CSV, SODA_FILE_XML,
+            COMPUTER_FILE_CSV, COMPUTER_FILE_XML,
+            FRIDGE_FILE_CSV, FRIDGE_FILE_XML,
+            BUCKET_FILE_CSV, BUCKET_FILE_XML,
+            SESSION_FILE_CSV, SESSION_FILE_XML,
+            RECEIPT_FILE_CSV, RECEIPT_FILE_XML,
+            JDBC_MV, JDBC_TRACE
+    );
+
+
 
 
     // Messages

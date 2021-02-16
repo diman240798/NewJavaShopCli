@@ -2,31 +2,22 @@ package ru.sfedu.shop.api;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import ru.sfedu.shop.Constants;
 import ru.sfedu.shop.api.helper.ExConsumer;
-import ru.sfedu.shop.api.helper.ExFunction;
 import ru.sfedu.shop.api.helper.InitializerData;
 import ru.sfedu.shop.beans.*;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.*;
 
-import static org.junit.Assert.*;
+public class DataProviderTest {
 
-public class AbstractDataProviderTest {
-
-    List<AbstractDataProvider> dbProviders;
+    List<DataProvider> dbProviders;
 
     @Before
     public void beforeEach() {
-        Constants.XML_FILES.forEach(File::delete);
-        Constants.CSV_FILES.forEach(File::delete);
-        Constants.JDBC_MV.delete();
-        Constants.JDBC_TRACE.delete();
+        Constants.DB_FILES.forEach(File::delete);
 
         dbProviders = Arrays.asList(
                 new DataProviderCsv(),
@@ -35,9 +26,9 @@ public class AbstractDataProviderTest {
         );
     }
 
-    public void runForAll(ExConsumer<AbstractDataProvider> action) throws Exception {
+    public void runForAll(ExConsumer<DataProvider> action) throws Exception {
         for (int i = 0; i < dbProviders.size(); i++) {
-            AbstractDataProvider provider = dbProviders.get(i);
+            DataProvider provider = dbProviders.get(i);
             action.accept(provider);
         }
     }
@@ -45,7 +36,7 @@ public class AbstractDataProviderTest {
     @Test
     public void init() throws Exception {
         runForAll(dbProvider -> {
-             dbProvider.init();
+            dbProvider.init();
 
             Assert.assertTrue(Objects.deepEquals(dbProvider.getAll(Constants.CATEGORY), InitializerData.CATEGORIES));
             Assert.assertTrue(Objects.deepEquals(dbProvider.getAll(Constants.COMPUTER), InitializerData.COMPUTERS));
@@ -82,6 +73,24 @@ public class AbstractDataProviderTest {
     public void getCategoryBad() throws Exception {
         runForAll(dbProvider -> {
             Optional<Category> model = dbProvider.getCategory(0);
+            Assert.assertFalse(model.isPresent());
+        });
+    }
+
+    @Test
+    public void getComputer() throws Exception {
+        runForAll(dbProvider -> {
+            Computer model = InitializerData.COMPUTERS.get(0);
+            dbProvider.insertList(Collections.singletonList(model), Constants.COMPUTER);
+            Object modelDb = dbProvider.getComputer(model.getId()).get();
+            Assert.assertEquals(model, modelDb);
+        });
+    }
+
+    @Test
+    public void getComputerBad() throws Exception {
+        runForAll(dbProvider -> {
+            Optional<Computer> model = dbProvider.getComputer(0);
             Assert.assertFalse(model.isPresent());
         });
     }
@@ -143,66 +152,43 @@ public class AbstractDataProviderTest {
     @Test
     public void insertComputer() throws Exception {
         runForAll(dbProvider -> {
-            Computer model = InitializerData.COMPUTERS.get(0);
-                dbProvider.insertList(Collections.singletonList(model), Constants.COMPUTER);
-            Object modelDb = dbProvider.getComputer(model.getId()).get();
-            Assert.assertEquals(model, modelDb);
+            dbProvider.insertComputer("10 Hp_pavillion 2.4 64300 intel_i5 600 geforge_gtx_1060 2 true true");
+            Computer modelDb = dbProvider.getComputer(10).get();
+            Assert.assertEquals("Hp_pavillion", modelDb.getName());
         });
     }
 
     @Test
     public void insertComputerBad() throws Exception {
-        runForAll(dbProvider -> {
-            List<Fridge> items = new ArrayList<Fridge>() { { add(null); }};
-            String category = Constants.COMPUTER;
-            dbProvider.insertList(items, category);
-            Object itemsDb = dbProvider.getAll(category);
-            Assert.assertNotEquals(items, itemsDb);
-        });
-    }
-
-    @Test
-    public void insertFridge() throws Exception {
-        runForAll(dbProvider -> {
-            List<Fridge> items = InitializerData.FRIDGES;
-            String category = Constants.FRIDGE;
-            dbProvider.insertList(items, category);
-            Object itemsDb = dbProvider.getAll(category);
-            Assert.assertEquals(items, itemsDb);
-        });
-    }
-
-    @Test
-    public void insertFridgeBad() throws Exception {
-        runForAll(dbProvider -> {
-            List<Fridge> items = new ArrayList<Fridge>() { { add(null); }};
-            String category = Constants.FRIDGE;
-            dbProvider.insertList(items, category);
-            Object itemsDb = dbProvider.getAll(category);
-            Assert.assertNotEquals(items, itemsDb);
-        });
+        runForAll(dbProvider -> Assert.assertFalse(dbProvider.insertComputer("")));
     }
 
     @Test
     public void insertSoda() throws Exception {
         runForAll(dbProvider -> {
-            List<Soda> items = InitializerData.SODA;
-            String category = Constants.SODA;
-            dbProvider.insertList(items, category);
-            Object itemsDb = dbProvider.getAll(category);
-            Assert.assertEquals(items, itemsDb);
+            dbProvider.insertSoda("10 tasty_fanta 1.5 300 orange");
+            Soda modelDb = dbProvider.getSoda(10).get();
+            Assert.assertEquals("tasty_fanta", modelDb.getName());
         });
     }
 
     @Test
     public void insertSodaBad() throws Exception {
+        runForAll(dbProvider -> Assert.assertFalse(dbProvider.insertSoda("")));
+    }
+
+    @Test
+    public void insertFridge() throws Exception {
         runForAll(dbProvider -> {
-            List<Fridge> items = new ArrayList<Fridge>() { { add(null); }};
-            String category = Constants.SODA;
-            dbProvider.insertList(items, category);
-            Object itemsDb = dbProvider.getAll(category);
-            Assert.assertNotEquals(items, itemsDb);
+            dbProvider.insertFridge("10 Toshiba_x_32 55.4 64300 80 white 900 true");
+            Fridge modelDb = dbProvider.getFridge(10).get();
+            Assert.assertEquals("Toshiba_x_32", modelDb.getName());
         });
+    }
+
+    @Test
+    public void insertFridgeBad() throws Exception {
+        runForAll(dbProvider -> Assert.assertFalse(dbProvider.insertFridge("")));
     }
 
     @Test
@@ -268,12 +254,7 @@ public class AbstractDataProviderTest {
 
     @Test
     public void deleteBucketBad() throws Exception {
-        runForAll(dbProvider -> {
-            String entity = Constants.BUCKET;
-            dbProvider.insertList(Collections.singletonList(null), entity);
-            List items = dbProvider.getAll(entity);
-            Assert.assertTrue(items.isEmpty());
-        });
+        runForAll(dbProvider -> Assert.assertTrue(dbProvider.deleteBucket(new Bucket(63643284, UUID.randomUUID().toString()))));
     }
 
     @Test
@@ -289,11 +270,6 @@ public class AbstractDataProviderTest {
 
     @Test
     public void deleteSessionBad() throws Exception {
-        runForAll(dbProvider -> {
-            String entity = Constants.SESSION;
-            dbProvider.insertList(Collections.singletonList(null), entity);
-            List items = dbProvider.getAll(entity);
-            Assert.assertTrue(items.isEmpty());
-        });
+        runForAll(dbProvider -> Assert.assertTrue(dbProvider.deleteSession(565645645)));
     }
 }

@@ -7,13 +7,12 @@ import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 import ru.sfedu.shop.Constants;
-import ru.sfedu.shop.beans.*;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataProviderXml implements AbstractDataProvider {
+public class DataProviderXml implements DataProvider {
 
 
     public final static Logger LOG = LogManager.getLogger(DataProviderCsv.class);

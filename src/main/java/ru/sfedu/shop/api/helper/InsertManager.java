@@ -7,6 +7,8 @@ import ru.sfedu.shop.beans.Computer;
 import ru.sfedu.shop.beans.Fridge;
 import ru.sfedu.shop.beans.Soda;
 
+import java.util.Optional;
+
 public class InsertManager {
 
 
@@ -18,7 +20,11 @@ public class InsertManager {
      * @param modelStr - данные модели в виде строки
      * @return Computer
      */
-    public static Computer getComputerFromString(String modelStr) {
+    public static Optional<Computer> getComputerFromString(String modelStr) {
+        if (modelStr == null || modelStr.isEmpty()) {
+            LOG.error("Incorrect computer model: {}", modelStr);
+            return Optional.empty();
+        }
         LOG.info("Parsing string to model");
         LOG.debug("Parsing string to model {}", modelStr);
         String[] split = modelStr.split("\\s");
@@ -34,10 +40,10 @@ public class InsertManager {
         if (split.length > 8) {
             boolean wifiIntegrated = Boolean.parseBoolean(split[8]);
             boolean bluetoothIntegrated = Boolean.parseBoolean(split[9]);
-            return new Computer(id, name, weight, price, Constants.CATEGORY_COMPUTER, processorName, processorPower, graphicsName, graphicsVolume, wifiIntegrated, bluetoothIntegrated);
+            return Optional.of(new Computer(id, name, weight, price, Constants.CATEGORY_COMPUTER, processorName, processorPower, graphicsName, graphicsVolume, wifiIntegrated, bluetoothIntegrated));
         }
 
-        return new Computer(id, name, weight, price, Constants.CATEGORY_COMPUTER, processorName, processorPower, graphicsName, graphicsVolume);
+        return Optional.of(new Computer(id, name, weight, price, Constants.CATEGORY_COMPUTER, processorName, processorPower, graphicsName, graphicsVolume));
     }
 
     /**
@@ -46,7 +52,11 @@ public class InsertManager {
      * @param modelStr - данные модели в виде строки
      * @return Soda
      */
-    public static Soda getSodaFromString(String modelStr) {
+    public static Optional<Soda> getSodaFromString(String modelStr) {
+        if (modelStr == null || modelStr.isEmpty()) {
+            LOG.error("Incorrect soda model: {}", modelStr);
+            return Optional.empty();
+        }
         LOG.info("Parsing string to model");
         LOG.debug("Parsing string to model {}", modelStr);
         String[] split = modelStr.split("\\s");
@@ -57,9 +67,9 @@ public class InsertManager {
         String flavour = split[4];
         if (split.length > 5) {
             boolean sparkled = Boolean.parseBoolean(split[5]);
-            return new Soda(id, name, weight, price, Constants.CATEGORY_SODA, flavour, sparkled);
+            return Optional.of(new Soda(id, name, weight, price, Constants.CATEGORY_SODA, flavour, sparkled));
         } else {
-            return new Soda(id, name, weight, price, Constants.CATEGORY_SODA, flavour);
+            return Optional.of(new Soda(id, name, weight, price, Constants.CATEGORY_SODA, flavour));
         }
     }
 
@@ -69,7 +79,11 @@ public class InsertManager {
      * @param modelStr - данные модели в виде строки
      * @return Fridge
      */
-    public static Fridge getFridgeFromString(String modelStr) {
+    public static Optional<Fridge> getFridgeFromString(String modelStr) {
+        if (modelStr == null || modelStr.isEmpty()) {
+            LOG.error("Incorrect fridge model: {}", modelStr);
+            return Optional.empty();
+        }
         LOG.info("Parsing string to model");
         LOG.debug("Parsing string to model {}", modelStr);
         String[] split = modelStr.split("\\s");
@@ -83,9 +97,9 @@ public class InsertManager {
 
         if (split.length > 7) {
             boolean noFrost = Boolean.parseBoolean(split[7]);
-            return new Fridge(id, name, weight, price, Constants.CATEGORY_FRIDGE, volume, color, power, noFrost);
+            return Optional.of(new Fridge(id, name, weight, price, Constants.CATEGORY_FRIDGE, volume, color, power, noFrost));
         }
 
-        return new Fridge(id, name, weight, price, Constants.CATEGORY_FRIDGE, volume, color, power);
+        return Optional.of(new Fridge(id, name, weight, price, Constants.CATEGORY_FRIDGE, volume, color, power));
     }
 }
