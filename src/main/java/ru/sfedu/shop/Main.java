@@ -83,6 +83,10 @@ public class Main {
     }
 
 
+    /**
+    * Вызов метода API согласно параметрам
+     * @return String - Constants.BAD_ARGS, Constants.FAILURE, Constants.SUCCESS
+    * */
     private static String resolveAPIResult(DataProvider dataProvider, String[] arguments) {
         try {
             String action = arguments[1];
@@ -233,6 +237,10 @@ public class Main {
         return Constants.FAILURE;
     }
 
+    /**
+    * Выбор нужного dataProvider
+    * @return DataProvider
+    * */
     private static DataProvider resolveDataProvider(String[] arguments) {
         LOG.info("Resolving csv provider");
         LOG.debug("Resolving csv provider by args {}", String.join(",", arguments));

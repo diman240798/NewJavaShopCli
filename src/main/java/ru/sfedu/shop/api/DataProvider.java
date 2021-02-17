@@ -45,7 +45,7 @@ public interface DataProvider {
     /**
      * Поиск по id
      * @param id - идентификатор модели
-     * @return Optional<Category>
+     * @return Optional<Computer>
      */
     default Optional<Computer> getComputer(long id) {
         return getAll(Constants.COMPUTER).stream()
@@ -56,7 +56,7 @@ public interface DataProvider {
     /**
      * Поиск по id
      * @param id - идентификатор модели
-     * @return Optional<Category>
+     * @return Optional<Fridge>
      */
     default Optional<Fridge> getFridge(long id) {
         return getAll(Constants.FRIDGE).stream()
@@ -67,7 +67,7 @@ public interface DataProvider {
     /**
      * Поиск по id
      * @param id - идентификатор модели
-     * @return Optional<Category>
+     * @return Optional<Receipt>
      */
     default Optional<Receipt> getReceipt(long id) {
         return getAll(Constants.RECEIPT).stream()
@@ -78,7 +78,7 @@ public interface DataProvider {
     /**
      * Поиск по id
      * @param id - идентификатор модели
-     * @return Optional<Category>
+     * @return Optional<Soda>
      */
     default Optional<Soda> getSoda(long id) {
         return getAll(Constants.SODA).stream()
@@ -410,6 +410,5 @@ public interface DataProvider {
                 .collect(Collectors.toList());
         items.add(item);
         return insertList(items, entity);
-
     }
 }
