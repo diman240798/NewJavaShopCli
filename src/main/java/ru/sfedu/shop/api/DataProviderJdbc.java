@@ -282,9 +282,7 @@ public class DataProviderJdbc implements DataProvider {
 
     private String getValuesReceipt(Receipt model) {
         List<Product> products = model.getProducts();
-        String productsStr = products.stream()
-                .map(product -> product.getId() + Constants.PRODUCT_CATEGORY_SEPARATOR + product.getCategory())
-                .reduce((p1, p2) -> p1 + PRODUCTS_SEPATOR).orElse("");
+        String productsStr = ProductTransformer.productListToString(products);
         return String.format("%d, '%s', '%s'", model.getId(), productsStr, model.getTotalPrice());
     }
 

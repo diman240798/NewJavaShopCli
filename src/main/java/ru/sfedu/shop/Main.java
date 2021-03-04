@@ -25,11 +25,11 @@ public class Main {
         initEnvironmentConstants();
 
         DataProvider dataProvider = resolveDataProvider(args);
-        LOG.info("DataProvider chosen: Success!");
         if (dataProvider == null) {
             LOG.error(Constants.BAD_ARGS);
             System.exit(1);
         }
+        LOG.info("DataProvider chosen: Success!");
         String result = resolveAPIResult(dataProvider, args);
         LOG.info("Api result {}", result);
     }
@@ -226,8 +226,8 @@ public class Main {
     * @return DataProvider
     * */
     private static DataProvider resolveDataProvider(String[] arguments) {
-        LOG.info("Resolving csv provider");
-        LOG.debug("Resolving csv provider by args {}", String.join(",", arguments));
+        LOG.info("Resolving provider");
+        LOG.debug("Resolving provider by args {}", String.join(",", arguments));
         if (arguments.length == 0) {
             throw new RuntimeException("Empty arguments!");
         }

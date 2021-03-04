@@ -18,9 +18,9 @@ public class InitializerData {
     public final static Category CATEGORY_SODA = new Category(Constants.CATEGORY_SODA);
 
     public final static List<Category> CATEGORIES = Arrays.asList(
-            CATEGORY_SODA,
             CATEGORY_COMPUTER,
-            CATEGORY_FRIDGE
+            CATEGORY_FRIDGE,
+            CATEGORY_SODA
     );
 
     public final static List<Fridge> FRIDGES = Arrays.asList(

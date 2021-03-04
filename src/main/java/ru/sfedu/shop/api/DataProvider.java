@@ -111,7 +111,7 @@ public interface DataProvider {
             Computer item = itemOption.get();
             String entity = Constants.COMPUTER;
             List<Computer> items = getAll(entity);
-            List<Long> ids =  items.stream().map(Product::getId).collect(Collectors.toList());
+            List<Long> ids = items.stream().map(Product::getId).collect(Collectors.toList());
             return insertCheckId(item.getId(), ids, item, items, entity);
         }
         return false;
@@ -218,14 +218,19 @@ public interface DataProvider {
         LOG.info("Found product: {}", product);
         Optional<Bucket> bucketOption = getBucketById(bucketId);
 
-
-        Bucket bucket = bucketOption.orElseGet(
-                () -> new Bucket(UUID.randomUUID().toString())
-        );
+        Bucket bucket;
+        if (bucketOption.isPresent()) {
+            bucket = bucketOption.get();
+        } else if (bucketId.isPresent()) {
+            LOG.error("Bucket with id: {} doesnt exist!", bucketId.get());
+            return false;
+        } else {
+            bucket = new Bucket(UUID.randomUUID().toString());
+        }
 
         bucket.getProducts().add(product);
         if (upsertBucket(bucket)) {
-            LOG.info("Product added succesfully");
+            LOG.info("Product added succesfully: Bucket id {}", bucket.getId());
             return true;
         } else {
             LOG.info("Error inserting bucket");
@@ -300,6 +305,7 @@ public interface DataProvider {
         List<Bucket> newList = all.stream()
                 .filter(it -> !Objects.equals(it.getId(), bucket.getId()))
                 .collect(Collectors.toList());
+        if (newList.size() == all.size()) return false;
         return setItemsList(newList, entity);
     }
 
