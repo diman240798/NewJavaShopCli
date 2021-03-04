@@ -1,28 +1,39 @@
 package ru.sfedu.shop.beans;
 
+import com.opencsv.bean.CsvBindByName;
+import ru.sfedu.shop.api.helper.InitializerData;
+
 import java.util.Objects;
 
 public class Computer extends Product {
+    @CsvBindByName
     private String processorName;
+    @CsvBindByName
     private int processorPower;
+    @CsvBindByName
     private String graphicsName;
+    @CsvBindByName
     private int graphicsVolume;
-    private boolean integratedWifi = false;
-    private boolean integratedBluetooth = false;
+    @CsvBindByName
+    private boolean integratedWifi;
+    @CsvBindByName
+    private boolean integratedBluetooth;
+
 
     public Computer() {}
 
-    public Computer(long id, String name, double weight, double price, String category, String processorName, int processorPower, String graphicsName, int graphicsVolume, boolean integratedWifi, boolean integratedBluetooth) {
-        this(id, name, weight, price, category, processorName, processorPower, graphicsName, graphicsVolume);
-        this.integratedWifi = integratedWifi;
-        this.integratedBluetooth = integratedBluetooth;
-    }
-    public Computer(long id, String name, double weight, double price, String category, String processorName, int processorPower, String graphicsName, int graphicsVolume) {
-        super(id, name, weight, price, category);
+    public Computer(long id, String name, double weight, double price, String processorName, int processorPower, String graphicsName, int graphicsVolume) {
+        super(id, name, weight, price, InitializerData.CATEGORY_COMPUTER);
         this.processorName = processorName;
         this.processorPower = processorPower;
         this.graphicsName = graphicsName;
         this.graphicsVolume = graphicsVolume;
+    }
+
+    public Computer(long id, String name, double weight, double price, String processorName, int processorPower, String graphicsName, int graphicsVolume, boolean integratedWifi, boolean integratedBluetooth) {
+        this(id, name, weight, price, processorName, processorPower, graphicsName, graphicsVolume);
+        this.integratedWifi = integratedWifi;
+        this.integratedBluetooth = integratedBluetooth;
     }
 
     public String getProcessorName() {
@@ -88,23 +99,18 @@ public class Computer extends Product {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getProcessorName(), getProcessorPower(), getGraphicsName(), getGraphicsVolume(), isIntegratedWifi(), isIntegratedBluetooth());
+        return Objects.hash(getProcessorName(), getProcessorPower(), getGraphicsName(), getGraphicsVolume(), isIntegratedWifi(), isIntegratedBluetooth());
     }
 
     @Override
     public String toString() {
         return "Computer{" +
-                "processorName=" + processorName +
+                "processorName='" + processorName + '\'' +
                 ", processorPower=" + processorPower +
-                ", graphicsName=" + graphicsName +
+                ", graphicsName='" + graphicsName + '\'' +
                 ", graphicsVolume=" + graphicsVolume +
                 ", integratedWifi=" + integratedWifi +
                 ", integratedBluetooth=" + integratedBluetooth +
-                ", name=" + name +
-                ", weight=" + weight +
-                ", price=" + price +
-                ", category=" + category +
-                ", id=" + id +
                 '}';
     }
 }

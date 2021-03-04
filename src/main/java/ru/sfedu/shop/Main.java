@@ -64,9 +64,6 @@ public class Main {
         Constants.BUCKET_FILE_XML = new File(configurationUtil.readConfig( Constants.BUCKET_KEY_XML));
         Constants.BUCKET_FILE_CSV = new File(configurationUtil.readConfig( Constants.BUCKET_KEY_CSV ));
 
-        Constants.SESSION_FILE_XML = new File(configurationUtil.readConfig( Constants.SESSION_KEY_XML));
-        Constants.SESSION_FILE_CSV = new File(configurationUtil.readConfig( Constants.SESSION_KEY_CSV));
-
         Constants.RECEIPT_FILE_XML = new File(configurationUtil.readConfig( Constants.RECEIPT_KEY_XML));
         Constants.RECEIPT_FILE_CSV = new File(configurationUtil.readConfig( Constants.RECEIPT_KEY_CSV));
 
@@ -76,7 +73,6 @@ public class Main {
                 COMPUTER_FILE_CSV, COMPUTER_FILE_XML,
                 FRIDGE_FILE_CSV, FRIDGE_FILE_XML,
                 BUCKET_FILE_CSV, BUCKET_FILE_XML,
-                SESSION_FILE_CSV, SESSION_FILE_XML,
                 RECEIPT_FILE_CSV, RECEIPT_FILE_XML,
                 JDBC_MV, JDBC_TRACE
         );
@@ -125,18 +121,7 @@ public class Main {
                 }
 
                 // GET BY ID
-                case Constants.GET_CATEGORY: {
-                    long id = Long.parseLong(arguments[2]);
-                    Optional<Category> item = dataProvider.getCategory(id);
-                    if (item.isPresent()) {
-                        LOG.info(item.get());
-                    } else {
-                        LOG.info("Item with such id doesnt exist");
-                        LOG.debug("Item with such id doesnt exist: {}", id);
-                    }
-                    break;
-                }
-                case Constants.GET_COMPUTER: {
+               case Constants.GET_COMPUTER: {
                     long id = Long.parseLong(arguments[2]);
                     Optional<Computer> item = dataProvider.getComputer(id);
                     if (item.isPresent()) {
@@ -205,22 +190,21 @@ public class Main {
                 }
 
                 // SHOP ACTIONS
-                case Constants.START_SESSION: {
-                    LOG.info("Session started: {}", dataProvider.startSession());
-                    break;
-                }
-                case Constants.FINISH_SESSION: {
+                case Constants.CLOSE_BUCKET: {
                     String userSession = arguments[2];
-                    if (!dataProvider.finishSession(userSession)) {
+                    if (!dataProvider.closeBucket(userSession)) {
                         return Constants.FAILURE;
                     }
                     break;
                 }
                 case Constants.ADD_PRODUCT_TO_BUCKET: {
-                    String userSession = arguments[2];
-                    long prodId = Long.parseLong(arguments[3]);
-                    String category = arguments[4];
-                    if (!dataProvider.addProduct(userSession, prodId, category)) {
+                    long prodId = Long.parseLong(arguments[2]);
+                    String category = arguments[3];
+                    Optional<String> bucketId = Optional.empty();
+                    if (arguments.length > 4) {
+                        bucketId = Optional.of(arguments[4]);
+                    }
+                    if (!dataProvider.addProduct(prodId, category, bucketId)) {
                         return Constants.FAILURE;
                     }
                     break;

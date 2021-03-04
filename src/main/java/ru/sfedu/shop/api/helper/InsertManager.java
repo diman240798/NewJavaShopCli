@@ -2,7 +2,6 @@ package ru.sfedu.shop.api.helper;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.sfedu.shop.Constants;
 import ru.sfedu.shop.beans.Computer;
 import ru.sfedu.shop.beans.Fridge;
 import ru.sfedu.shop.beans.Soda;
@@ -10,8 +9,6 @@ import ru.sfedu.shop.beans.Soda;
 import java.util.Optional;
 
 public class InsertManager {
-
-
     public final static Logger LOG = LogManager.getLogger(InsertManager.class);
 
 
@@ -40,10 +37,10 @@ public class InsertManager {
         if (split.length > 8) {
             boolean wifiIntegrated = Boolean.parseBoolean(split[8]);
             boolean bluetoothIntegrated = Boolean.parseBoolean(split[9]);
-            return Optional.of(new Computer(id, name, weight, price, Constants.CATEGORY_COMPUTER, processorName, processorPower, graphicsName, graphicsVolume, wifiIntegrated, bluetoothIntegrated));
+            return Optional.of(new Computer(id, name, weight, price, processorName, processorPower, graphicsName, graphicsVolume, wifiIntegrated, bluetoothIntegrated));
         }
 
-        return Optional.of(new Computer(id, name, weight, price, Constants.CATEGORY_COMPUTER, processorName, processorPower, graphicsName, graphicsVolume));
+        return Optional.of(new Computer(id, name, weight, price, processorName, processorPower, graphicsName, graphicsVolume));
     }
 
     /**
@@ -67,9 +64,9 @@ public class InsertManager {
         String flavour = split[4];
         if (split.length > 5) {
             boolean sparkled = Boolean.parseBoolean(split[5]);
-            return Optional.of(new Soda(id, name, weight, price, Constants.CATEGORY_SODA, flavour, sparkled));
+            return Optional.of(new Soda(id, name, weight, price, flavour, sparkled));
         } else {
-            return Optional.of(new Soda(id, name, weight, price, Constants.CATEGORY_SODA, flavour));
+            return Optional.of(new Soda(id, name, weight, price, flavour));
         }
     }
 
@@ -97,9 +94,9 @@ public class InsertManager {
 
         if (split.length > 7) {
             boolean noFrost = Boolean.parseBoolean(split[7]);
-            return Optional.of(new Fridge(id, name, weight, price, Constants.CATEGORY_FRIDGE, volume, color, power, noFrost));
+            return Optional.of(new Fridge(id, name, weight, price, volume, color, power, noFrost));
         }
 
-        return Optional.of(new Fridge(id, name, weight, price, Constants.CATEGORY_FRIDGE, volume, color, power));
+        return Optional.of(new Fridge(id, name, weight, price, volume, color, power));
     }
 }

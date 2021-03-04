@@ -1,21 +1,30 @@
 package ru.sfedu.shop.beans;
 
+import com.opencsv.bean.CsvBindByName;
+import ru.sfedu.shop.api.helper.InitializerData;
+
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Fridge extends Product {
+public class Fridge extends Product implements Serializable {
+    @CsvBindByName
     private int volume;
+    @CsvBindByName
     private String color;
+    @CsvBindByName
     private int power;
-    private boolean noFrost = false;
+    @CsvBindByName
+    private boolean noFrost;
 
     public Fridge() {}
 
-    public Fridge(long id, String name, double weight, double price, String category, int volume, String color, int power, boolean noFrost) {
-        this(id, name, weight, price, category, volume, color, power);
+    public Fridge(long id, String name, double weight, double price, int volume, String color, int power, boolean noFrost) {
+        this(id, name, weight, price, volume, color, power);
         this.noFrost = noFrost;
     }
-    public Fridge(long id, String name, double weight, double price, String category, int volume, String color, int power) {
-        super(id, name, weight, price, category);
+
+    public Fridge(long id, String name, double weight, double price, int volume, String color, int power) {
+        super(id, name, weight, price, InitializerData.CATEGORY_FRIDGE);
         this.volume = volume;
         this.color = color;
         this.power = power;
@@ -57,6 +66,7 @@ public class Fridge extends Product {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Fridge)) return false;
+        if (!super.equals(o)) return false;
         Fridge fridge = (Fridge) o;
         return getVolume() == fridge.getVolume() &&
                 getPower() == fridge.getPower() &&
@@ -73,14 +83,9 @@ public class Fridge extends Product {
     public String toString() {
         return "Fridge{" +
                 "volume=" + volume +
-                ", color=" + color +
+                ", color='" + color + '\'' +
                 ", power=" + power +
                 ", noFrost=" + noFrost +
-                ", name=" + name +
-                ", weight=" + weight +
-                ", price=" + price +
-                ", category=" + category +
-                ", id=" + id +
                 '}';
     }
 }

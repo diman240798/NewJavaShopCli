@@ -1,56 +1,46 @@
 package ru.sfedu.shop.beans;
 
-import ru.sfedu.shop.Constants;
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvCustomBindByName;
+import ru.sfedu.shop.api.helper.ProductTransformer;
 
-import java.util.Arrays;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Bucket {
-    private long id;
-    private String session;
-    private String products = "";
+public class Bucket implements Serializable {
+    @CsvBindByName
+    private String id;
+    @CsvCustomBindByName(column = "products", converter = ProductTransformer.class)
+    private List<Product> products;
 
     public Bucket() {}
 
-    public Bucket(long id, String session) {
-        setId(id);
-        this.session = session;
-    }
-
-    public Bucket(long id, String session, String products) {
-        this(id, session);
+    public Bucket(String id, List<Product> products) {
+        this.id = id;
         this.products = products;
     }
 
-    public String getSession() {
-        return session;
-    }
-
-    public List<String> getProductsList() {
-        return Arrays.asList(products.split(Constants.PRODUCTS_SEPATOR));
-    }
-
-    public String getProducts() {
-        return products;
-    }
-
-
-    public void setId(long id) {
+    public Bucket(String id) {
         this.id = id;
+        this.products = new ArrayList<>();
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void addProduct(long productId, Category category) {
-        String categoryName = category.getName();
-        if (products.length() > 0) {
-            products = products + Constants.PRODUCTS_SEPATOR + categoryName + Constants.PRODUCT_CATEGORY_SEPARATOR + productId;
-        } else {
-            products = categoryName + Constants.PRODUCT_CATEGORY_SEPARATOR + productId;
-        }
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
     }
 
     @Override
@@ -58,22 +48,20 @@ public class Bucket {
         if (this == o) return true;
         if (!(o instanceof Bucket)) return false;
         Bucket bucket = (Bucket) o;
-        return Objects.equals(getSession(), bucket.getSession()) &&
-                Objects.equals(products, bucket.products);
+        return Objects.equals(getId(), bucket.getId()) &&
+                Objects.equals(getProducts(), bucket.getProducts());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getSession(), products, id);
+        return Objects.hash(getId(), getProducts());
     }
 
     @Override
     public String toString() {
         return "Bucket{" +
-                "session=" + session +
+                "id='" + id + '\'' +
                 ", products=" + products +
-                ", id=" + id +
                 '}';
     }
-
 }

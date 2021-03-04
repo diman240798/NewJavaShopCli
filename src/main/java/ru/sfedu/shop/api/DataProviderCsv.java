@@ -1,5 +1,7 @@
 package ru.sfedu.shop.api;
 
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 import com.opencsv.bean.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,9 +22,11 @@ public class DataProviderCsv implements DataProvider {
      * @param items - список элементов
      * @return
      */
-    public boolean insertList(List items, String entity) throws Exception {
+    public <T> boolean setItemsList(List<T> items, String entity) throws Exception {
         File dbFile = getDbFileForEntity(entity);
-        if (items == null || items.contains(null)) {
+        Class clazz = getClassForEntity(entity);
+
+        if (items == null || items.contains(null) || items.isEmpty()) {
             dbFile.delete();
             return false;
         }
@@ -32,12 +36,32 @@ public class DataProviderCsv implements DataProvider {
             dir.mkdirs();
         }
 
-
         try (Writer writer = new FileWriter(dbFile)) {
-            StatefulBeanToCsv sbc = new StatefulBeanToCsvBuilder(writer).build();
-            sbc.write(items);
+            CSVWriter writerCsv = new CSVWriter(writer);
+            StatefulBeanToCsv<T> beanToCsv = new StatefulBeanToCsvBuilder<T>(writerCsv)
+                    .withApplyQuotesToAll(false)
+                    .build();
+            beanToCsv.write(items);
         }
         return true;
+    }
+
+    private Class getClassForEntity(String entity) {
+        switch (entity) {
+            case Constants.BUCKET:
+                return Bucket.class;
+            case Constants.CATEGORY:
+                return Category.class;
+            case Constants.COMPUTER:
+                return Computer.class;
+            case Constants.FRIDGE:
+                return Fridge.class;
+            case Constants.RECEIPT:
+                return Receipt.class;
+            case Constants.SODA:
+                return Soda.class;
+        }
+        throw new RuntimeException("Unknown entity: " + entity);
     }
 
     private File getDbFileForEntity(String entity) {
@@ -52,8 +76,6 @@ public class DataProviderCsv implements DataProvider {
                 return Constants.FRIDGE_FILE_CSV;
             case Constants.RECEIPT:
                 return Constants.RECEIPT_FILE_CSV;
-            case Constants.SESSION:
-                return Constants.SESSION_FILE_CSV;
             case Constants.SODA:
                 return Constants.SODA_FILE_CSV;
         }
@@ -61,33 +83,19 @@ public class DataProviderCsv implements DataProvider {
     }
 
     @Override
-    public List getAll(String entity) {
-        if (entity.equals(Constants.BUCKET)) {
-            return getAll(Constants.BUCKET_FILE_CSV, Bucket.class);
-        } else if (entity.equals(Constants.CATEGORY)) {
-            return getAll(Constants.CATEGORY_FILE_CSV, Category.class);
-        } else if (entity.equals(Constants.COMPUTER)) {
-            return getAll(Constants.COMPUTER_FILE_CSV, Computer.class);
-        } else if (entity.equals(Constants.FRIDGE)) {
-            return getAll(Constants.FRIDGE_FILE_CSV, Fridge.class);
-        } else if (entity.equals(Constants.RECEIPT)) {
-            return getAll(Constants.RECEIPT_FILE_CSV, Receipt.class);
-        } else if (entity.equals(Constants.SESSION)) {
-            return getAll(Constants.SESSION_FILE_CSV, Session.class);
-        } else if (entity.equals(Constants.SODA)) {
-            return getAll(Constants.SODA_FILE_CSV, Soda.class);
-        }
-        throw new RuntimeException("Incorrect csv dbFile");
+    public <T> List<T> getAll(String entity) {
+        File dbFileForEntity = getDbFileForEntity(entity);
+        Class classForEntity = getClassForEntity(entity);
+        return getAll(dbFileForEntity, classForEntity);
     }
 
     private List getAll(File dbFile, Class clazz) {
         if (!dbFile.exists()) return new ArrayList<>();
         try (Reader reader = new FileReader(dbFile)) {
-            HeaderColumnNameMappingStrategy ms = new HeaderColumnNameMappingStrategy();
-            ms.setType(clazz);
+            CSVReader csvReader = new CSVReader(reader);
 
             CsvToBean cb = new CsvToBeanBuilder(reader)
-                    .withMappingStrategy(ms)
+                    .withType(clazz)
                     .build();
 
             List result = cb.parse();

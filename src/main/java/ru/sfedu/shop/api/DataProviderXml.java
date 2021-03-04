@@ -24,9 +24,9 @@ public class DataProviderXml implements DataProvider {
      * @return
      */
     @Override
-    public boolean insertList(List items, String entity) throws Exception {
+    public <T> boolean setItemsList(List<T> items, String entity) throws Exception {
         File dbFile = getDbFileForEntity(entity);
-        if (items == null || items.contains(null)) {
+        if (items == null || items.contains(null) || items.isEmpty()) {
             dbFile.delete();
             return false;
         }
@@ -54,8 +54,6 @@ public class DataProviderXml implements DataProvider {
                 return Constants.FRIDGE_FILE_XML;
             case Constants.RECEIPT:
                 return Constants.RECEIPT_FILE_XML;
-            case Constants.SESSION:
-                return Constants.SESSION_FILE_XML;
             case Constants.SODA:
                 return Constants.SODA_FILE_XML;
         }

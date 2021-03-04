@@ -1,21 +1,27 @@
 package ru.sfedu.shop.beans;
 
 
+import com.opencsv.bean.CsvBindByName;
+import ru.sfedu.shop.api.helper.InitializerData;
+
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Soda extends Product {
+public class Soda extends Product implements Serializable {
+    @CsvBindByName
     private String flavour;
+    @CsvBindByName
     private boolean sparkled = false;
 
     public Soda() {}
 
-    public Soda(long id, String name, double weight, double price, String category, String flavour, boolean sparkled) {
-        this(id, name, weight, price, category, flavour);
+    public Soda(long id, String name, double weight, double price, String flavour, boolean sparkled) {
+        this(id, name, weight, price, flavour);
         this.sparkled = sparkled;
     }
 
-    public Soda(long id, String name, double wight, double price, String category, String flavour) {
-        super(id, name, wight, price, category);
+    public Soda(long id, String name, double weight, double price, String flavour) {
+        super(id, name, weight, price, InitializerData.CATEGORY_SODA);
         this.flavour = flavour;
     }
 
@@ -46,19 +52,14 @@ public class Soda extends Product {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getFlavour(), isSparkled());
+        return Objects.hash(getFlavour(), isSparkled());
     }
 
     @Override
     public String toString() {
         return "Soda{" +
-                "flavour=" + flavour +
+                "flavour='" + flavour + '\'' +
                 ", sparkled=" + sparkled +
-                ", name=" + name +
-                ", weight=" + weight +
-                ", price=" + price +
-                ", category=" + category +
-                ", id=" + id +
                 '}';
     }
 }

@@ -1,16 +1,18 @@
 package ru.sfedu.shop.beans;
 
+import com.opencsv.bean.CsvBindByName;
+
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Category {
-    private long id;
+public class Category  implements Serializable {
+    @CsvBindByName
     private String name;
 
     public Category() {}
 
-    public Category(long id, String name) {
-        setId(id);
-        setName(name);
+    public Category(String name) {
+        this.name = name;
     }
 
     public String getName() {
@@ -21,20 +23,12 @@ public class Category {
         this.name = name;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Category)) return false;
         Category category = (Category) o;
-        return getId() == category.getId() && Objects.equals(getName(), category.getName());
+        return Objects.equals(getName(), category.getName());
     }
 
     @Override
@@ -44,6 +38,8 @@ public class Category {
 
     @Override
     public String toString() {
-        return "{ id: " + id + ",name: " + name +"}";
+        return "Category{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

@@ -29,17 +29,15 @@ public class Constants {
     public static final String GET_RECEIPT = "get_receipt";
 
     // Shop
-    public static final String START_SESSION = "start_session";
-    public static final String FINISH_SESSION = "finish_session";
     public static final String ADD_PRODUCT_TO_BUCKET = "add_product";
+    public static final String CLOSE_BUCKET = "close_bucket";
 
     // Models
-    public static final String BUCKET = "add";
+    public static final String BUCKET = "bucket";
     public static final String CATEGORY = "category";
     public static final String COMPUTER = "computer";
     public static final String FRIDGE = "fridge";
     public static final String RECEIPT = "receipt";
-    public static final String SESSION = "session";
     public static final String SODA = "soda";
 
     // Data Providers
@@ -69,8 +67,6 @@ public class Constants {
     public static final String RECEIPT_KEY_CSV = "receipt_csv";
     public static final String SODA_KEY_XML = "soda_xml";
     public static final String SODA_KEY_CSV = "soda_csv";
-    public static final String SESSION_KEY_XML = "session_xml";
-    public static final String SESSION_KEY_CSV = "session_csv";
 
 
     // Files CSV
@@ -79,7 +75,6 @@ public class Constants {
     public static File COMPUTER_FILE_CSV = new File("./csv/computer.csv");
     public static File FRIDGE_FILE_CSV = new File("./csv/fridge.csv");
     public static File RECEIPT_FILE_CSV = new File("./csv/receipt.csv");
-    public static File SESSION_FILE_CSV = new File("./csv/session.csv");
     public static File SODA_FILE_CSV = new File("./csv/soda.csv");
 
     // Files XML
@@ -88,7 +83,6 @@ public class Constants {
     public static File COMPUTER_FILE_XML = new File("./xml/computer.xml");
     public static File FRIDGE_FILE_XML = new File("./xml/fridge.xml");
     public static File RECEIPT_FILE_XML = new File("./xml/receipt.xml");
-    public static File SESSION_FILE_XML = new File("./xml/session.xml");
     public static File SODA_FILE_XML = new File("./xml/soda.xml");
 
     // File JDBC
@@ -104,7 +98,6 @@ public class Constants {
             COMPUTER_FILE_CSV, COMPUTER_FILE_XML,
             FRIDGE_FILE_CSV, FRIDGE_FILE_XML,
             BUCKET_FILE_CSV, BUCKET_FILE_XML,
-            SESSION_FILE_CSV, SESSION_FILE_XML,
             RECEIPT_FILE_CSV, RECEIPT_FILE_XML,
             JDBC_MV, JDBC_TRACE
     );
@@ -119,12 +112,10 @@ public class Constants {
 
     // JDBC
     public static final String BUCKET_CREATE_QUERY =
-            "id BIGINT not NULL PRIMARY KEY, " +
-            "session VARCHAR(255)," +
+            "id VARCHAR(255) not NULL PRIMARY KEY, " +
             "products VARCHAR(255)";
     public static final String CATEGORY_CREATE_QUERY =
-            "id BIGINT not NULL PRIMARY KEY, " +
-            "name VARCHAR(255)";
+            "name VARCHAR(255) not NULL PRIMARY KEY";
     public static final String COMPUTER_CREATE_QUERY =
             "id BIGINT not NULL PRIMARY KEY, " +
             "name VARCHAR(255), " +
@@ -149,12 +140,8 @@ public class Constants {
             "noFrost BIT";
     public static final String RECEIPT_CREATE_QUERY =
             "id BIGINT not NULL PRIMARY KEY, " +
-            "productsAndPrices VARCHAR(255)," +
+            "products VARCHAR(255)," +
             "totalPrice DOUBLE";
-    public static final String SESSION_CREATE_QUERY =
-            "id BIGINT not NULL PRIMARY KEY, " +
-            "session VARCHAR(255)," +
-            "date LONG";
     public static final String SODA_CREATE_QUERY =
             "id BIGINT not NULL PRIMARY KEY, " +
             "name VARCHAR(255), " +
@@ -170,7 +157,6 @@ public class Constants {
             COMPUTER_CREATE_QUERY,
             FRIDGE_CREATE_QUERY,
             RECEIPT_CREATE_QUERY,
-            SESSION_CREATE_QUERY,
             SODA_CREATE_QUERY
     );
     public static final List<String> ENTITIES = Arrays.asList(
@@ -179,7 +165,6 @@ public class Constants {
             COMPUTER,
             FRIDGE,
             RECEIPT,
-            SESSION,
             SODA
     );
 }

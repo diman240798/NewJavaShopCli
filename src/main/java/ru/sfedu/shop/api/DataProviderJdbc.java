@@ -2,11 +2,15 @@ package ru.sfedu.shop.api;
 
 import ru.sfedu.shop.Constants;
 import ru.sfedu.shop.api.helper.ExFunction;
+import ru.sfedu.shop.api.helper.InitializerData;
+import ru.sfedu.shop.api.helper.ProductTransformer;
 import ru.sfedu.shop.beans.*;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static ru.sfedu.shop.Constants.*;
 
@@ -96,8 +100,6 @@ public class DataProviderJdbc implements DataProvider {
                 return getModelFridge(resultSet);
             case Constants.RECEIPT:
                 return getModelReceipt(resultSet);
-            case Constants.SESSION:
-                return getModelSession(resultSet);
             case Constants.SODA:
                 return getModelSoda(resultSet);
         }
@@ -105,16 +107,15 @@ public class DataProviderJdbc implements DataProvider {
     }
 
     private Bucket getModelBucket(ResultSet resultSet) throws SQLException {
-        long id = resultSet.getLong("id");
-        String session = resultSet.getString("session");
-        String products = resultSet.getString("products");
-        return new Bucket(id, session, products);
+        String id = resultSet.getString("id");
+        String productsStr = resultSet.getString("products");
+        List<Product> productList = ProductTransformer.productStringToList(productsStr, this);
+        return new Bucket(id, productList);
     }
 
     private Category getModelCategory(ResultSet resultSet) throws SQLException {
-        long id = resultSet.getLong("id");
         String name = resultSet.getString("name");
-        return new Category(id, name);
+        return new Category(name);
     }
 
     private Computer getModelComputer(ResultSet resultSet) throws SQLException {
@@ -122,7 +123,6 @@ public class DataProviderJdbc implements DataProvider {
         String name = resultSet.getString("name");
         double weight = resultSet.getDouble("weight");
         double price = resultSet.getDouble("price");
-        String category = resultSet.getString("category");
         String processorName = resultSet.getString("processorName");
         int processorPower = resultSet.getInt("processorPower");
         String graphicsName = resultSet.getString("graphicsName");
@@ -134,7 +134,6 @@ public class DataProviderJdbc implements DataProvider {
                 name,
                 weight,
                 price,
-                category,
                 processorName,
                 processorPower,
                 graphicsName,
@@ -150,26 +149,33 @@ public class DataProviderJdbc implements DataProvider {
         String name = resultSet.getString("name");
         double weight = resultSet.getDouble("weight");
         double price = resultSet.getDouble("price");
-        String category = resultSet.getString("category");
         int volume = resultSet.getInt("volume");
         String color = resultSet.getString("color");
         int power = resultSet.getInt("power");
         boolean noFrost = resultSet.getBoolean("noFrost");
-        return new Fridge(id, name, weight, price, category, volume, color, power, noFrost);
+        return new Fridge(id, name, weight, price, volume, color, power, noFrost);
     }
 
     private Receipt getModelReceipt(ResultSet resultSet) throws SQLException {
         long id = resultSet.getLong("id");
-        String productsAndPrices = resultSet.getString("productsAndPrices");
-        double totalPrice = resultSet.getDouble("totalPrice");
-        return new Receipt(id, productsAndPrices, totalPrice);
-    }
 
-    private Session getModelSession(ResultSet resultSet) throws SQLException {
-        long id = resultSet.getLong("id");
-        String session = resultSet.getString("session");
-        long date = resultSet.getLong("date");
-        return new Session(id, session, date);
+        String productsStr = resultSet.getString("products");
+        List<Product> productList =
+                Arrays.stream(productsStr.split(PRODUCTS_SEPATOR))
+                        .map(it -> {
+                            String[] split = it.split(PRODUCT_CATEGORY_SEPARATOR);
+                            long prodId = Long.parseLong(split[0]);
+                            String prodCategory = split[1];
+
+                            Product product = getProductByIdAndCategory(prodId, prodCategory).get();
+                            return product;
+                        })
+                        .collect(Collectors.toList());
+
+
+        double totalPrice = resultSet.getDouble("totalPrice");
+
+        return new Receipt(id, productList, totalPrice);
     }
 
     private Soda getModelSoda(ResultSet resultSet) throws SQLException {
@@ -177,10 +183,9 @@ public class DataProviderJdbc implements DataProvider {
         String name = resultSet.getString("name");
         double weight = resultSet.getDouble("weight");
         double price = resultSet.getDouble("price");
-        String category = resultSet.getString("category");
         String flavour = resultSet.getString("flavour");
         boolean sparkled = resultSet.getBoolean("sparkled");
-        return new Soda(id, name, weight, price, category, flavour, sparkled);
+        return new Soda(id, name, weight, price, flavour, sparkled);
     }
 
     /**
@@ -214,8 +219,6 @@ public class DataProviderJdbc implements DataProvider {
                 return getValuesFridge((Fridge) model);
             case Constants.RECEIPT:
                 return getValuesReceipt((Receipt) model);
-            case Constants.SESSION:
-                return getValuesSession((Session) model);
             case Constants.SODA:
                 return getValuesSoda((Soda) model);
         }
@@ -224,11 +227,14 @@ public class DataProviderJdbc implements DataProvider {
 
 
     public String getValuesBucket(Bucket model) {
-        return String.format("%d, '%s', '%s'", model.getId(), model.getSession(), model.getProducts());
+        String id = model.getId();
+        List<Product> products = model.getProducts();
+        String productsStr = ProductTransformer.productListToString(products);
+        return String.format("'%s', '%s'", id, productsStr);
     }
 
     private String getValuesCategory(Category model) {
-        return String.format("%d, '%s'", model.getId(), model.getName());
+        return String.format("'%s'", model.getName());
     }
 
     private String getValuesComputer(Computer model) {
@@ -275,11 +281,11 @@ public class DataProviderJdbc implements DataProvider {
     }
 
     private String getValuesReceipt(Receipt model) {
-        return String.format("%d, '%s', '%s'", model.getId(), model.getProductsAndPrices(), model.getTotalPrice());
-    }
-
-    private String getValuesSession(Session model) {
-        return String.format("%d, '%s', %d", model.getId(), model.getSession(), model.getDate());
+        List<Product> products = model.getProducts();
+        String productsStr = products.stream()
+                .map(product -> product.getId() + Constants.PRODUCT_CATEGORY_SEPARATOR + product.getCategory())
+                .reduce((p1, p2) -> p1 + PRODUCTS_SEPATOR).orElse("");
+        return String.format("%d, '%s', '%s'", model.getId(), productsStr, model.getTotalPrice());
     }
 
     private String getValuesSoda(Soda model) {
@@ -304,7 +310,7 @@ public class DataProviderJdbc implements DataProvider {
      * Метод вставки списка записей
      */
     @Override
-    public boolean insertList(List items, String entity) throws Exception {
+    public <T> boolean setItemsList(List<T> items, String entity) throws Exception {
         if (items == null || items.contains(null)) {
             LOG.info("Attempt to insert list with null");
             LOG.debug("Attempt to insert list with null");
