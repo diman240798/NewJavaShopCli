@@ -23,7 +23,6 @@ public class Constants {
 
     // GET BY ID
     public static final String GET_COMPUTER = "get_computer";
-    public static final String GET_CATEGORY = "get_category";
     public static final String GET_FRIDGE = "get_fridge";
     public static final String GET_SODA = "get_soda";
     public static final String GET_RECEIPT = "get_receipt";

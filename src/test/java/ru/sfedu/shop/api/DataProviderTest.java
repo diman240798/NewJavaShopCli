@@ -163,8 +163,8 @@ public abstract class DataProviderTest {
         Fridge product = InitializerData.FRIDGES.get(0);
         dbProvider.addProduct(product.getId(), Constants.FRIDGE, Optional.empty());
         Bucket bucket = (Bucket) dbProvider.getAll(Constants.BUCKET).get(0);
-        boolean finishSession = dbProvider.closeBucket(bucket.getId());
-        Assert.assertTrue(finishSession);
+        boolean closeBucket = dbProvider.closeBucket(bucket.getId());
+        Assert.assertTrue(closeBucket);
     }
 
     @Test

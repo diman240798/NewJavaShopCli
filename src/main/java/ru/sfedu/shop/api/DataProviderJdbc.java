@@ -160,18 +160,7 @@ public class DataProviderJdbc implements DataProvider {
         long id = resultSet.getLong("id");
 
         String productsStr = resultSet.getString("products");
-        List<Product> productList =
-                Arrays.stream(productsStr.split(PRODUCTS_SEPATOR))
-                        .map(it -> {
-                            String[] split = it.split(PRODUCT_CATEGORY_SEPARATOR);
-                            long prodId = Long.parseLong(split[0]);
-                            String prodCategory = split[1];
-
-                            Product product = getProductByIdAndCategory(prodId, prodCategory).get();
-                            return product;
-                        })
-                        .collect(Collectors.toList());
-
+        List<Product> productList = ProductTransformer.productStringToList(productsStr, this);
 
         double totalPrice = resultSet.getDouble("totalPrice");
 

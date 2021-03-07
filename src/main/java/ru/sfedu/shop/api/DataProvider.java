@@ -159,7 +159,7 @@ public interface DataProvider {
     /**
      * Завершение покупок в магазине
      *
-     * @param bucketId - сессия юзера
+     * @param bucketId - id корзины
      * @return boolean - успешно, неуспешно
      */
     default boolean closeBucket(String bucketId) throws Exception {
